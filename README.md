@@ -1,78 +1,78 @@
-﻿# PixelPix
+# PixelPix
 
-Gerador e decodificador de payload **PIX estÃ¡tico** â€” o padrÃ£o EMVÂ®/BR Code definido pelo Banco Central para o "PIX copia e cola" â€” escrito em TypeScript, com uma interface web em React para gerar o QR Code em tempo real.
+Gerador e decodificador de payload **PIX estático** — o padrão EMV®/BR Code definido pelo Banco Central para o "PIX copia e cola" — escrito em TypeScript, com uma interface web em React para gerar o QR Code em tempo real.
 
 [![CI](https://github.com/MaatheusPolli/pixel-pix/actions/workflows/ci.yml/badge.svg)](https://github.com/MaatheusPolli/pixel-pix/actions)
-[![LicenÃ§a](https://img.shields.io/badge/licenÃ§a-todos%20os%20direitos%20reservados-red)](./LICENSE)
+[![Licença: MIT pessoal + comercial](https://img.shields.io/badge/licen%C3%A7a-MIT%20pessoal%20%2B%20comercial-blue.svg)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Cobertura](https://img.shields.io/badge/cobertura-%E2%89%A596%25-brightgreen)
 ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
-> âš ï¸ Projeto de portfÃ³lio, sob licenÃ§a proprietÃ¡ria. Ver [LicenÃ§a](#licenÃ§a) antes de reutilizar qualquer parte do cÃ³digo â€” leitura para avaliaÃ§Ã£o Ã© bem-vinda, uso e cÃ³pia nÃ£o sÃ£o permitidos sem autorizaÃ§Ã£o.
+> Projeto de portfólio com licença dupla: livre para uso pessoal e educacional (MIT), licença comercial para uso comercial. Ver [Licença](#licença).
 
 ## Sobre o projeto
 
-Todo desenvolvedor brasileiro, em algum momento, precisa gerar um cÃ³digo PIX "copia e cola" â€” e descobre que a especificaÃ§Ã£o do Bacen (baseada no padrÃ£o internacional EMVÂ® QRCPS-MPM) nÃ£o Ã© trivial: os dados sÃ£o organizados em uma Ã¡rvore de campos **TLV** (Tag-Length-Value) aninhados, o valor precisa ser formatado com exatidÃ£o, textos precisam ser normalizados para um charset ASCII restrito, e o payload inteiro Ã© fechado com uma checksum **CRC16-CCITT** calculada byte a byte.
+Todo desenvolvedor brasileiro, em algum momento, precisa gerar um código PIX "copia e cola" — e descobre que a especificação do Bacen (baseada no padrão internacional EMV® QRCPS-MPM) não é trivial: os dados são organizados em uma árvore de campos **TLV** (Tag-Length-Value) aninhados, o valor precisa ser formatado com exatidão, textos precisam ser normalizados para um charset ASCII restrito, e o payload inteiro é fechado com uma checksum **CRC16-CCITT** calculada byte a byte.
 
 O **PixelPix** resolve isso de duas formas:
 
-1. **`@pixelpix/core`** â€” uma biblioteca TypeScript pura que monta, valida e decodifica esse payload, sem nenhuma dependÃªncia de runtime alÃ©m do [Zod](https://zod.dev/).
-2. **`apps/web`** â€” uma interface React que usa a lib para transformar um formulÃ¡rio simples (chave Pix, nome, cidade, valor opcional) em um QR Code exibido instantaneamente, tudo rodando no navegador â€” nenhum dado Ã© enviado a um servidor.
+1. **`@pixelpix/core`** — uma biblioteca TypeScript pura que monta, valida e decodifica esse payload, sem nenhuma dependência de runtime além do [Zod](https://zod.dev/).
+2. **`apps/web`** — uma interface React que usa a lib para transformar um formulário simples (chave Pix, nome, cidade, valor opcional) em um QR Code exibido instantaneamente, tudo rodando no navegador — nenhum dado é enviado a um servidor.
 
-Foi construÃ­do como peÃ§a de portfÃ³lio para demonstrar TypeScript avanÃ§ado (tipos discriminados, validaÃ§Ã£o com Zod, `strict` sem `any`), organizaÃ§Ã£o de monorepo, e uma suÃ­te de testes sÃ©ria (unitÃ¡rios, golden tests com payloads reais e testes baseados em propriedades) sobre uma lÃ³gica de domÃ­nio genuinamente nÃ£o-trivial.
+Foi construído como peça de portfólio para demonstrar TypeScript avançado (tipos discriminados, validação com Zod, `strict` sem `any`), organização de monorepo, e uma suíte de testes séria (unitários, golden tests com payloads reais e testes baseados em propriedades) sobre uma lógica de domínio genuinamente não-trivial.
 
 ## O que ele faz
 
-- **Gera** o payload PIX estÃ¡tico a partir de: chave Pix, nome do recebedor, cidade, valor (opcional), identificador da transaÃ§Ã£o/`txid` (opcional) e descriÃ§Ã£o (opcional).
-- **Detecta automaticamente o tipo da chave** informada como texto livre â€” CPF e CNPJ (com validaÃ§Ã£o real dos dÃ­gitos verificadores, mÃ³dulo 11), e-mail, telefone (com ou sem `+55`) ou chave aleatÃ³ria (EVP/UUID).
-- **Calcula e anexa o CRC16** exigido pela especificaÃ§Ã£o (polinÃ´mio `0x1021`, valor inicial `0xFFFF`).
-- **Normaliza texto livre** â€” remove acentos e caracteres fora do charset ASCII permitido, jÃ¡ que o payload inteiro precisa ser ASCII puro (o comprimento declarado em cada campo TLV Ã© contado em caracteres, mas o CRC Ã© calculado sobre os bytes UTF-8 â€” os dois sÃ³ coincidem se o texto for ASCII).
-- **Decodifica** um payload existente de volta a um objeto tipado, verificando tambÃ©m se o CRC embutido confere com o calculado.
-- **Renderiza o QR Code** ao vivo, com validaÃ§Ã£o de erros em tempo real e um botÃ£o para copiar o cÃ³digo.
+- **Gera** o payload PIX estático a partir de: chave Pix, nome do recebedor, cidade, valor (opcional), identificador da transação/`txid` (opcional) e descrição (opcional).
+- **Detecta automaticamente o tipo da chave** informada como texto livre — CPF e CNPJ (com validação real dos dígitos verificadores, módulo 11), e-mail, telefone (com ou sem `+55`) ou chave aleatória (EVP/UUID).
+- **Calcula e anexa o CRC16** exigido pela especificação (polinômio `0x1021`, valor inicial `0xFFFF`).
+- **Normaliza texto livre** — remove acentos e caracteres fora do charset ASCII permitido, já que o payload inteiro precisa ser ASCII puro (o comprimento declarado em cada campo TLV é contado em caracteres, mas o CRC é calculado sobre os bytes UTF-8 — os dois só coincidem se o texto for ASCII).
+- **Decodifica** um payload existente de volta a um objeto tipado, verificando também se o CRC embutido confere com o calculado.
+- **Renderiza o QR Code** ao vivo, com validação de erros em tempo real e um botão para copiar o código.
 
 ## Como usar
 
 ```bash
 pnpm install
-pnpm build        # builda @pixelpix/core â€” necessÃ¡rio antes do app web
+pnpm build        # builda @pixelpix/core — necessário antes do app web
 pnpm dev          # abre em http://localhost:5173
 ```
 
-1. Preencha **Chave Pix** (CPF, CNPJ, e-mail, telefone ou chave aleatÃ³ria â€” o tipo Ã© detectado automaticamente), **Nome do recebedor** e **Cidade**.
-2. Opcionalmente, informe **Valor**, **Identificador (txid)** e **DescriÃ§Ã£o**.
-3. O QR Code Ã© gerado instantaneamente conforme vocÃª digita, com validaÃ§Ã£o de erros em tempo real.
-4. Clique em **Copiar cÃ³digo Pix** para copiar o "copia e cola", ou escaneie o QR Code direto com o app do seu banco.
+1. Preencha **Chave Pix** (CPF, CNPJ, e-mail, telefone ou chave aleatória — o tipo é detectado automaticamente), **Nome do recebedor** e **Cidade**.
+2. Opcionalmente, informe **Valor**, **Identificador (txid)** e **Descrição**.
+3. O QR Code é gerado instantaneamente conforme você digita, com validação de erros em tempo real.
+4. Clique em **Copiar código Pix** para copiar o "copia e cola", ou escaneie o QR Code direto com o app do seu banco.
 
-Nenhum dado sai do seu navegador â€” nÃ£o hÃ¡ backend, nÃ£o hÃ¡ coleta de informaÃ§Ã£o.
+Nenhum dado sai do seu navegador — não há backend, não há coleta de informação.
 
-### Fora do escopo (por decisÃ£o de projeto)
+### Fora do escopo (por decisão de projeto)
 
-- PIX dinÃ¢mico (o tipo que depende de integraÃ§Ã£o com um PSP/banco).
-- Leitura de QR Code por cÃ¢mera.
-- Qualquer backend ou persistÃªncia â€” Ã© 100% client-side.
+- PIX dinâmico (o tipo que depende de integração com um PSP/banco).
+- Leitura de QR Code por câmera.
+- Qualquer backend ou persistência — é 100% client-side.
 
-## Como o payload Ã© montado
+## Como o payload é montado
 
 ```
-entrada â†’ valida (Zod) â†’ normaliza (remove acentos, ajusta charset)
-        â†’ monta Ã¡rvore TLV â†’ serializa â†’ anexa cabeÃ§alho do CRC ("6304")
-        â†’ calcula CRC16 â†’ payload final
+entrada → valida (Zod) → normaliza (remove acentos, ajusta charset)
+        → monta árvore TLV → serializa → anexa cabeçalho do CRC ("6304")
+        → calcula CRC16 → payload final
 ```
 
-Os principais campos do padrÃ£o EMV usados pelo PIX:
+Os principais campos do padrão EMV usados pelo PIX:
 
-| ID   | Campo                    | ConteÃºdo                                                                |
+| ID   | Campo                    | Conteúdo                                                                |
 | ---- | ------------------------ | ----------------------------------------------------------------------- |
 | `00` | Payload Format Indicator | `01` (fixo)                                                             |
-| `26` | Merchant Account Info    | sub-campos: `00` GUI (`br.gov.bcb.pix`), `01` chave Pix, `02` descriÃ§Ã£o |
+| `26` | Merchant Account Info    | sub-campos: `00` GUI (`br.gov.bcb.pix`), `01` chave Pix, `02` descrição |
 | `52` | Merchant Category Code   | `0000`                                                                  |
 | `53` | Moeda                    | `986` (BRL)                                                             |
 | `54` | Valor                    | opcional                                                                |
-| `58` | PaÃ­s                     | `BR`                                                                    |
-| `59` | Nome do recebedor        | atÃ© 25 caracteres                                                       |
-| `60` | Cidade do recebedor      | atÃ© 15 caracteres                                                       |
+| `58` | País                     | `BR`                                                                    |
+| `59` | Nome do recebedor        | até 25 caracteres                                                       |
+| `60` | Cidade do recebedor      | até 15 caracteres                                                       |
 | `62` | Dados adicionais         | sub-campo `05`: `txid`                                                  |
-| `63` | CRC16                    | 4 dÃ­gitos hexadecimais                                                  |
+| `63` | CRC16                    | 4 dígitos hexadecimais                                                  |
 
 ## Estrutura do projeto
 
@@ -80,36 +80,36 @@ Monorepo gerenciado com **pnpm workspaces**:
 
 ```
 pixel-pix/
-â”œâ”€â”€ packages/
-â”‚   â””â”€â”€ core/                    # @pixelpix/core â€” lib pura, publicÃ¡vel, sem UI
-â”‚       â”œâ”€â”€ src/
-â”‚       â”‚   â”œâ”€â”€ domain/          # tipos e constantes do padrÃ£o EMV/Pix
-â”‚       â”‚   â”œâ”€â”€ validation/      # schemas Zod + detecÃ§Ã£o/validaÃ§Ã£o de chave
-â”‚       â”‚   â”œâ”€â”€ encoder/         # normalizaÃ§Ã£o, CRC16, TLV, montagem do payload
-â”‚       â”‚   â””â”€â”€ decoder/         # parse do TLV e reconstruÃ§Ã£o tipada
-â”‚       â””â”€â”€ tests/               # unitÃ¡rios, golden tests, property-based
-â””â”€â”€ apps/
-    â””â”€â”€ web/                     # app React + Vite â€” formulÃ¡rio, QR Code, copiar
-        â””â”€â”€ src/
-            â”œâ”€â”€ components/      # PixForm, QrPreview, CopyButton
-            â””â”€â”€ hooks/           # usePixPayload â€” liga o formulÃ¡rio Ã  lib
+├── packages/
+│   └── core/                    # @pixelpix/core — lib pura, publicável, sem UI
+│       ├── src/
+│       │   ├── domain/          # tipos e constantes do padrão EMV/Pix
+│       │   ├── validation/      # schemas Zod + detecção/validação de chave
+│       │   ├── encoder/         # normalização, CRC16, TLV, montagem do payload
+│       │   └── decoder/         # parse do TLV e reconstrução tipada
+│       └── tests/               # unitários, golden tests, property-based
+└── apps/
+    └── web/                     # app React + Vite — formulário, QR Code, copiar
+        └── src/
+            ├── components/      # PixForm, QrPreview, CopyButton
+            └── hooks/           # usePixPayload — liga o formulário à lib
 ```
 
-A lib segue uma pequena arquitetura em camadas, com o domÃ­nio isolado de I/O â€” `core` nÃ£o depende de DOM, `Date`, `Math.random` ou qualquer efeito colateral, o que o torna 100% testÃ¡vel de forma determinÃ­stica.
+A lib segue uma pequena arquitetura em camadas, com o domínio isolado de I/O — `core` não depende de DOM, `Date`, `Math.random` ou qualquer efeito colateral, o que o torna 100% testável de forma determinística.
 
-## Stack tÃ©cnica
+## Stack técnica
 
-| Camada                 | Tecnologia                                      | Por quÃª                                                   |
+| Camada                 | Tecnologia                                      | Por quê                                                   |
 | ---------------------- | ----------------------------------------------- | --------------------------------------------------------- |
-| Linguagem              | TypeScript 5 (`strict`, sem `any`)              | seguranÃ§a de tipos ponta a ponta                          |
-| ValidaÃ§Ã£o              | Zod 3                                           | schemas tipados, mensagens de erro claras e agregadas     |
-| Build da lib           | tsup                                            | gera ESM + CJS + `.d.ts` com configuraÃ§Ã£o mÃ­nima          |
-| Testes                 | Vitest 4 + `@vitest/coverage-v8` + `fast-check` | rÃ¡pido, nativo em TS, com testes baseados em propriedades |
-| UI                     | React 18 + Vite 6                               | padrÃ£o de mercado                                         |
-| QR Code                | `qrcode.react`                                  | renderizaÃ§Ã£o em SVG, direto no cliente                    |
-| Lint/Format            | ESLint (typescript-eslint) + Prettier           | consistÃªncia de cÃ³digo                                    |
+| Linguagem              | TypeScript 5 (`strict`, sem `any`)              | segurança de tipos ponta a ponta                          |
+| Validação              | Zod 3                                           | schemas tipados, mensagens de erro claras e agregadas     |
+| Build da lib           | tsup                                            | gera ESM + CJS + `.d.ts` com configuração mínima          |
+| Testes                 | Vitest 4 + `@vitest/coverage-v8` + `fast-check` | rápido, nativo em TS, com testes baseados em propriedades |
+| UI                     | React 18 + Vite 6                               | padrão de mercado                                         |
+| QR Code                | `qrcode.react`                                  | renderização em SVG, direto no cliente                    |
+| Lint/Format            | ESLint (typescript-eslint) + Prettier           | consistência de código                                    |
 | CI                     | GitHub Actions                                  | lint, typecheck, testes com cobertura e build a cada push |
-| Gerenciador de pacotes | pnpm                                            | workspaces nativos, instalaÃ§Ã£o rÃ¡pida                     |
+| Gerenciador de pacotes | pnpm                                            | workspaces nativos, instalação rápida                     |
 
 ## Uso da biblioteca
 
@@ -123,54 +123,51 @@ const payload = buildPixPayload({
   amount: 99.9,
   txid: 'PEDIDO123',
 });
-// â†’ '00020126380014br.gov.bcb.pix0116loja@exemplo.com...6304F849'
+// → '00020126380014br.gov.bcb.pix0116loja@exemplo.com...6304F849'
 
 const decoded = parsePixPayload(payload);
-// â†’ { key: { kind: 'email', value: 'loja@exemplo.com' }, merchantName: 'Loja Exemplo', amount: 99.9, crcValid: true, ... }
+// → { key: { kind: 'email', value: 'loja@exemplo.com' }, merchantName: 'Loja Exemplo', amount: 99.9, crcValid: true, ... }
 ```
 
-Entradas invÃ¡lidas lanÃ§am `PixValidationError`, que agrega **todos** os problemas encontrados (nÃ£o sÃ³ o primeiro), cada um com um cÃ³digo estÃ¡vel (`INVALID_KEY`, `INVALID_AMOUNT`, etc.) para tratamento programÃ¡tico. HÃ¡ tambÃ©m `safeValidatePixInput`, uma versÃ£o sem exceÃ§Ã£o pensada para uso em formulÃ¡rios.
+Entradas inválidas lançam `PixValidationError`, que agrega **todos** os problemas encontrados (não só o primeiro), cada um com um código estável (`INVALID_KEY`, `INVALID_AMOUNT`, etc.) para tratamento programático. Há também `safeValidatePixInput`, uma versão sem exceção pensada para uso em formulários.
 
 ## Desenvolvimento
 
 ```bash
-pnpm install        # instala dependÃªncias
-pnpm build          # builda @pixelpix/core â€” necessÃ¡rio antes do app web
+pnpm install        # instala dependências
+pnpm build          # builda @pixelpix/core — necessário antes do app web
 pnpm dev            # roda o app web (http://localhost:5173)
 pnpm test           # roda os testes de todos os pacotes
-pnpm test:coverage  # cobertura do core (meta: â‰¥ 90%)
-pnpm lint           # verifica padrÃ£o de cÃ³digo
+pnpm test:coverage  # cobertura do core (meta: ≥ 90%)
+pnpm lint           # verifica padrão de código
 pnpm typecheck      # verifica tipos TypeScript
 pnpm format         # aplica o Prettier
 ```
 
-## EstratÃ©gia de testes
+## Estratégia de testes
 
-- **UnitÃ¡rios**: cada mÃ³dulo do `core` testado isoladamente â€” o CRC16, por exemplo, Ã© validado contra o vetor de teste canÃ´nico (`"123456789"` â†’ `29B1`).
-- **Golden tests**: payloads fixos e verificados em `packages/core/tests/fixtures/payloads.json` â€” o encoder precisa reproduzi-los byte a byte, e o decoder precisa fazer o caminho inverso corretamente.
-- **Property-based** (`fast-check`): para um universo de entradas vÃ¡lidas geradas aleatoriamente, `decode(encode(x))` sempre preserva a chave, o valor e produz um CRC vÃ¡lido.
-- **Invariantes de seguranÃ§a do formato**: um payload gerado Ã© sempre ASCII puro â€” o teste verifica que o comprimento em caracteres Ã© sempre igual ao nÃºmero de bytes UTF-8, condiÃ§Ã£o necessÃ¡ria para o TLV nÃ£o corromper.
+- **Unitários**: cada módulo do `core` testado isoladamente — o CRC16, por exemplo, é validado contra o vetor de teste canônico (`"123456789"` → `29B1`).
+- **Golden tests**: payloads fixos e verificados em `packages/core/tests/fixtures/payloads.json` — o encoder precisa reproduzi-los byte a byte, e o decoder precisa fazer o caminho inverso corretamente.
+- **Property-based** (`fast-check`): para um universo de entradas válidas geradas aleatoriamente, `decode(encode(x))` sempre preserva a chave, o valor e produz um CRC válido.
+- **Invariantes de segurança do formato**: um payload gerado é sempre ASCII puro — o teste verifica que o comprimento em caracteres é sempre igual ao número de bytes UTF-8, condição necessária para o TLV não corromper.
 
-A cobertura atual do `core` estÃ¡ acima de 96% (linhas e statements), com o CI configurado para falhar abaixo de 90%.
+A cobertura atual do `core` está acima de 96% (linhas e statements), com o CI configurado para falhar abaixo de 90%.
 
-## LicenÃ§a
+## Status
 
-**Todos os direitos reservados.** Este repositÃ³rio Ã© pÃºblico apenas para fins de portfÃ³lio â€” leitura para avaliaÃ§Ã£o tÃ©cnica Ã© bem-vinda, mas **cÃ³pia, redistribuiÃ§Ã£o e qualquer forma de uso do cÃ³digo sÃ£o proibidos** sem autorizaÃ§Ã£o expressa. Ver o arquivo [LICENSE](./LICENSE) para os termos completos.
+Implementado (core + interface web React).
 
+Pendências conhecidas:
+
+- testar o payload gerado no app de pelo menos 2 bancos
+- publicar a demo
+- CI verde e cobertura ≥ 90% no core
 
 ## Licença
 
-### Uso Pessoal
-Este projeto é licenciado sob a **Licença MIT** para uso pessoal, educacional e não comercial.
+Este projeto usa **licença dupla**. O texto completo está em [LICENSE](LICENSE).
 
-### Uso Comercial
-Se você deseja usar este projeto comercialmente, deve obter uma licença comercial do autor.
+- **Uso pessoal, educacional e não comercial:** livre, nos termos da licença MIT (mantenha o aviso de copyright).
+- **Uso comercial:** exige licença comercial. Isso inclui usar em produto ou serviço comercial, vender acesso ou derivados, usar em atividades com fins lucrativos e implantar em empresas.
 
-**Uso comercial inclui:**
-- Incorporar em um produto comercial
-- Oferecer como serviço
-- Usar em atividades com fins lucrativos
-- Implantação empresarial
-
-**Para obter uma licença comercial:**
-Email: ma.polli@hotmail.com
+Contato para licença comercial: ma.polli@hotmail.com
